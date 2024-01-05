@@ -1,0 +1,75 @@
+import json
+from datetime import datetime, timedelta
+
+class ToDoList:
+    def __init__(self):
+        self.tasks = []
+        self.load_tasks()
+
+    def load_tasks(self):
+        try:
+            with open('tasks.json', 'r') as file:
+                self.tasks = json.load(file)
+        except FileNotFoundError:
+            pass
+
+    def save_tasks(self):
+        with open('tasks.json', 'w') as file:
+            json.dump(self.tasks, file)
+
+    def add_task(self, task, priority, due_date):
+        new_task = {
+            'task': task,
+            'priority': priority,
+            'due_date': due_date,
+            'completed': False
+        }
+        self.tasks.append(new_task)
+        self.save_tasks()
+
+    def remove_task(self, task_index):
+        if 0 <= task_index < len(self.tasks):
+            del self.tasks[task_index]
+            self.save_tasks()
+
+    def mark_completed(self, task_index):
+        if 0 <= task_index < len(self.tasks):
+            self.tasks[task_index]['completed'] = True
+            self.save_tasks()
+
+    def display_tasks(self):
+        for index, task in enumerate(self.tasks):
+            print(f"{index + 1}. [{task['priority']}] {task['task']} - Due: {task['due_date']} - Completed: {task['completed']}")
+
+# Example Usage
+todo_list = ToDoList()
+
+while True:
+    print("\n===== To-Do List =====")
+    print("1. Add Task")
+    print("2. Remove Task")
+    print("3. Mark Task as Completed")
+    print("4. Display Tasks")
+    print("0. Exit")
+
+    choice = input("Enter your choice: ")
+
+    if choice == '1':
+        task = input("Enter task: ")
+        priority = input("Enter priority (high/medium/low): ")
+        due_date = input("Enter due date (YYYY-MM-DD): ")
+        todo_list.add_task(task, priority, due_date)
+
+    elif choice == '2':
+        index = int(input("Enter task index to remove: ")) - 1
+        todo_list.remove_task(index)
+
+    elif choice == '3':
+        index = int(input("Enter task index to mark as completed: ")) - 1
+        todo_list.mark_completed(index)
+
+    elif choice == '4':
+        todo_list.display_tasks()
+
+    elif choice == '0':
+        break
